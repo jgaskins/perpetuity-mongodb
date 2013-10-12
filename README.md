@@ -1,6 +1,6 @@
-# Perpetuity::Mongodb
+# Perpetuity::MongoDB
 
-TODO: Write a gem description
+This is the MongoDB adapter for Perpetuity.
 
 ## Installation
 
@@ -18,7 +18,9 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+If you're using Rails, 
+
+For information on using Perpetuity to persist your Ruby objects, see the [main Perpetuity repo](https://github.com/jgaskins/perpetuity).
 
 ## Contributing
 
