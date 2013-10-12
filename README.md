@@ -18,7 +18,12 @@ Or install it yourself as:
 
 ## Usage
 
-If you're using Rails, 
+Put this at the top of your application (or in a Rails initializer):
+
+```ruby
+require 'perpetuity/mongodb' # Unnecessary if using Rails
+Perpetuity.data_source :mongodb, 'my_perpetuity_database'
+```
 
 For information on using Perpetuity to persist your Ruby objects, see the [main Perpetuity repo](https://github.com/jgaskins/perpetuity).
 
