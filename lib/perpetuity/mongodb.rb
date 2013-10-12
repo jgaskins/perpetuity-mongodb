@@ -1,3 +1,4 @@
+require 'perpetuity'
 require 'moped'
 require 'perpetuity/mongodb/query'
 require 'perpetuity/mongodb/nil_query'
