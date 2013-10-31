@@ -51,7 +51,7 @@ module Perpetuity
     def insert klass, objects, _
       if objects.is_a? Array
         objects.each do |object|
-          object[:_id] = object.delete(:id) || Moped::BSON::ObjectId.new
+          object[:_id] = object.delete('id') || Moped::BSON::ObjectId.new
         end
 
         collection(klass).insert objects
