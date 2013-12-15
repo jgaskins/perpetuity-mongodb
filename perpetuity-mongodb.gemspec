@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["jgaskins@gmail.com"]
   spec.description   = %q{MongoDB adapter for Perpetuity}
   spec.summary       = %q{MongoDB adapter for Perpetuity}
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/jgaskins/perpetuity-mongodb"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
