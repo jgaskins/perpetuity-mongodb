@@ -42,6 +42,14 @@ module Perpetuity
         QueryExpression.new self, :in, collection
       end
 
+      def any?
+        QueryExpression.new self, :not_equal, []
+      end
+
+      def none?
+        QueryExpression.new self, :equals, []
+      end
+
       def to_sym
         name
       end

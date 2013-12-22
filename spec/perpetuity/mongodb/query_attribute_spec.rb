@@ -51,6 +51,14 @@ module Perpetuity
       (attribute.in [1, 2, 3]).should be_a MongoDB::QueryExpression
     end
 
+    it 'checks for existence in an array' do
+      (attribute.any?).to_db.should == { attribute_name: { '$ne' => [] } }
+    end
+
+    it 'checks for nonexistence in an array' do
+      (attribute.none?).to_db.should == { attribute_name: [] }
+    end
+
     it 'checks for its own truthiness' do
       attribute.to_db.should == ((attribute != false) & (attribute != nil)).to_db
     end
