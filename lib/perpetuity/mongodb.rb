@@ -142,8 +142,15 @@ module Perpetuity
       retrieve klass, nil_query, {}
     end
 
-    def delete id, klass
-      collection(klass.to_s).find("_id" => id).remove
+    def delete ids, klass
+      ids = Array(ids)
+      if ids.one?
+        collection(klass.to_s).find("_id" => ids.first).remove
+      elsif ids.none?
+        # Nothing to delete
+      else
+        collection(klass.to_s).find("_id" => { "$in" => ids }).remove_all
+      end
     end
 
     def update klass, id, new_data
