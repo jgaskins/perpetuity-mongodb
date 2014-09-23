@@ -232,7 +232,7 @@ module Perpetuity
 
     private
     def serializable_types
-      @serializable_types ||= [NilClass, TrueClass, FalseClass, Fixnum, Float, String, Array, Hash, Time]
+      @serializable_types ||= [Symbol, NilClass, TrueClass, FalseClass, Fixnum, Float, String, Array, Hash, Time]
     end
   end
 end
