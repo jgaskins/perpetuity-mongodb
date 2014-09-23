@@ -91,11 +91,11 @@ module Perpetuity
       mongo.all(Object).should == values
     end
 
-    it 'retrieves by id if the id is a string' do
+    it 'retrieves by id if the id is a string converting it to BSON::ObjectId' do
       time = Time.now.utc
       id = mongo.insert Object, {inserted: time}, []
 
-      object = mongo.retrieve(Object, mongo.query{|o| o.id == id.to_s }).first
+      object = mongo.retrieve(Object, mongo.query{|o| o.id == id }).first
       retrieved_time = object["inserted"]
       retrieved_time.to_f.should be_within(0.001).of time.to_f
     end
@@ -137,7 +137,7 @@ module Perpetuity
 
       it 'can insert serializable values' do
         serializable_values.each do |value|
-          mongo.insert(Object, {value: value}, []).should be_a Moped::BSON::ObjectId
+          mongo.insert(Object, {value: value}, []).should be_a BSON::ObjectId
           mongo.can_serialize?(value).should be_true
         end
       end

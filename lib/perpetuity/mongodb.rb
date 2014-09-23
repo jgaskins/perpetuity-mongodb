@@ -51,7 +51,7 @@ module Perpetuity
     def insert klass, objects, _
       if objects.is_a? Array
         objects.each do |object|
-          object[:_id] = object.delete('id') || Moped::BSON::ObjectId.new
+          object[:_id] = object.delete('id') || BSON::ObjectId.new
         end
 
         collection(klass).insert objects
@@ -115,12 +115,12 @@ module Perpetuity
 
       # Check for both string and symbol ID in criteria
       if criteria.has_key?('id')
-        criteria['_id'] = Moped::BSON::ObjectId(criteria['id']) rescue criteria['id']
+        criteria['_id'] = ObjectId(criteria['id']) rescue criteria['id']
         criteria.delete 'id'
       end
 
       if criteria.has_key?(:id)
-        criteria[:_id] = Moped::BSON::ObjectId(criteria[:id]) rescue criteria[:id]
+        criteria[:_id] = ObjectId(criteria[:id]) rescue criteria[:id]
         criteria.delete :id
       end
 
