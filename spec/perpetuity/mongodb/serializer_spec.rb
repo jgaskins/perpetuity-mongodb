@@ -197,6 +197,7 @@ module Perpetuity
           'string' => 'hello',
           'boolean' => true,
           'float' => 7.5,
+          'symbol' => :sym,
           'time' => time
         }
 
@@ -205,6 +206,7 @@ module Perpetuity
         object.instance_variable_get(:@string).should == 'hello'
         object.instance_variable_get(:@boolean).should == true
         object.instance_variable_get(:@float).should == 7.5
+        object.instance_variable_get(:@symbol).should == :sym
         object.instance_variable_get(:@time).should == time
       end
     end
