@@ -137,7 +137,7 @@ module Perpetuity
 
       it 'can insert serializable values' do
         serializable_values.each do |value|
-          mongo.insert(Object, {value: value}, []).should be_a Moped::BSON::ObjectId
+          mongo.insert(Object, {value: value}, []).should be_a BSON::ObjectId
           mongo.can_serialize?(value).should be_true
         end
       end
