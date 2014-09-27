@@ -91,11 +91,11 @@ module Perpetuity
       mongo.all(Object).should == values
     end
 
-    it 'retrieves by id if the id is a string converting it to BSON::ObjectId' do
+    it 'retrieves by id if the id is a string' do
       time = Time.now.utc
       id = mongo.insert Object, {inserted: time}, []
 
-      object = mongo.retrieve(Object, mongo.query{|o| o.id == id }).first
+      object = mongo.retrieve(Object, mongo.query{|o| o.id == id.to_s }).first
       retrieved_time = object["inserted"]
       retrieved_time.to_f.should be_within(0.001).of time.to_f
     end

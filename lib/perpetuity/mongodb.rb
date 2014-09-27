@@ -124,6 +124,12 @@ module Perpetuity
         criteria.delete :id
       end
 
+      if criteria[:_id].is_a?(String) and !criteria[:_id].empty?
+        criteria[:_id] = BSON::ObjectId.from_string(criteria[:_id])
+      elsif criteria[:id].is_a?(String) and !criteria[:id].empty?
+        criteria['_id'] = BSON::ObjectId.from_string(criteria['_id'])
+      end
+
       criteria
     end
 
