@@ -5,20 +5,19 @@ module Perpetuity
   describe MongoDB do
     let(:mongo) { MongoDB.new db: 'perpetuity_gem_test' }
     let(:klass) { String }
-    subject { mongo }
 
     it 'is not connected when instantiated' do
-      mongo.should_not be_connected
+      expect(mongo).not_to be_connected
     end
 
     it 'connects to its host' do
       mongo.connect
-      mongo.should be_connected
+      expect(mongo).to be_connected
     end
 
     it 'connects automatically when accessing the database' do
       mongo.database
-      mongo.should be_connected
+      expect(mongo).to be_connected
     end
 
     describe 'initialization params' do
@@ -38,14 +37,30 @@ module Perpetuity
           password:  password
         )
       end
-      subject { mongo }
 
-      its(:host)      { should == host }
-      its(:port)      { should == port }
-      its(:db)        { should == db }
-      its(:pool_size) { should == pool_size }
-      its(:username)  { should == username }
-      its(:password)  { should == password }
+      it 'assigns the host' do
+        expect(mongo.host).to be == host
+      end
+
+      it 'assigns the port' do
+        expect(mongo.port).to be == port
+      end
+
+      it 'assigns the db' do
+        expect(mongo.db).to be == db
+      end
+
+      it 'assigns the pool_size' do
+        expect(mongo.pool_size).to be == pool_size
+      end
+
+      it 'assigns the username' do
+        expect(mongo.username).to be == username
+      end
+
+      it 'assigns the password' do
+        expect(mongo.password).to be == password
+      end
     end
 
     it 'inserts documents into a collection' do
@@ -60,7 +75,7 @@ module Perpetuity
     it 'removes all documents from a collection' do
       mongo.insert klass, {}, []
       mongo.delete_all klass
-      mongo.count(klass).should == 0
+      expect(mongo.count(klass)).to be == 0
     end
 
     it 'counts the documents in a collection' do
@@ -68,27 +83,29 @@ module Perpetuity
       3.times do
         mongo.insert klass, {}, []
       end
-      mongo.count(klass).should == 3
+      expect(mongo.count(klass)).to be == 3
     end
 
     it 'counts the documents matching a query' do
       mongo.delete_all klass
       1.times { mongo.insert klass, { name: 'bar' }, [] }
       3.times { mongo.insert klass, { name: 'foo' }, [] }
-      mongo.count(klass) { |o| o.name == 'foo' }.should == 3
+      expect(mongo.count(klass) { |o| o.name == 'foo' }).to be == 3
     end
 
     it 'gets the first document in a collection' do
       value = {value: 1}
       mongo.insert klass, value, []
-      mongo.first(klass)[:hypothetical_value].should == value['value']
+      expect(mongo.first(klass)[:hypothetical_value]).to be == value['value']
     end
 
     it 'gets all of the documents in a collection' do
       values = [{value: 1}, {value: 2}]
-      mongo.should_receive(:retrieve).with(Object, mongo.nil_query, {})
-           .and_return(values)
-      mongo.all(Object).should == values
+      allow(mongo).to receive(:retrieve)
+        .with(Object, mongo.nil_query, {})
+        .and_return(values)
+
+      expect(mongo.all(Object)).to be == values
     end
 
     it 'retrieves by id if the id is a string' do
@@ -97,7 +114,7 @@ module Perpetuity
 
       object = mongo.retrieve(Object, mongo.query{|o| o.id == id.to_s }).first
       retrieved_time = object["inserted"]
-      retrieved_time.to_f.should be_within(0.001).of time.to_f
+      expect(retrieved_time.to_f).to be_within(0.001).of time.to_f
     end
 
     describe 'serialization' do
@@ -117,7 +134,7 @@ module Perpetuity
       end
 
       it 'serializes objects' do
-        mongo.serialize(object, mapper).should == {
+        expect(mongo.serialize(object, mapper)).to be == {
           'foo' => 'bar',
           'baz' => 'quux'
         }
@@ -128,7 +145,7 @@ module Perpetuity
         updated.instance_variable_set :@foo, 'foo'
 
         serialized = mongo.serialize_changed_attributes(updated, object, mapper)
-        serialized.should == { 'foo' => 'foo' }
+        expect(serialized).to be == { 'foo' => 'foo' }
       end
     end
 
@@ -137,14 +154,14 @@ module Perpetuity
 
       it 'can insert serializable values' do
         serializable_values.each do |value|
-          mongo.insert(Object, {value: value}, []).should be_a Moped::BSON::ObjectId
-          mongo.can_serialize?(value).should be_true
+          expect(mongo.insert(Object, {value: value}, [])).to be_a Moped::BSON::ObjectId
+          expect(mongo.can_serialize?(value)).to be_truthy
         end
       end
     end
 
     it 'generates a new query DSL object' do
-      mongo.query { |object| object.whatever == 1 }.should respond_to :to_db
+      expect(mongo.query { |object| object.whatever == 1 }).to respond_to :to_db
     end
 
     describe 'indexing' do
@@ -156,13 +173,13 @@ module Perpetuity
 
       it 'adds indexes for the specified key on the specified collection' do
         indexes = mongo.indexes(collection).select{ |index| index.attribute == 'object_id' }
-        indexes.should_not be_empty
-        indexes.first.order.should be :ascending
+        expect(indexes).not_to be_empty
+        expect(indexes.first.order).to be :ascending
       end
 
       it 'adds descending-order indexes' do
         index = mongo.index collection, 'hash', order: :descending
-        index.order.should be :descending
+        expect(index.order).to be :descending
       end
 
       it 'creates indexes on the database collection' do
@@ -170,7 +187,7 @@ module Perpetuity
         index = mongo.index collection, 'real_index', order: :descending, unique: true
         mongo.activate_index! index
 
-        mongo.active_indexes(collection).should include index
+        expect(mongo.active_indexes(collection)).to include index
       end
 
       it 'removes indexes' do
@@ -178,21 +195,19 @@ module Perpetuity
         index = mongo.index collection, 'real_index', order: :descending, unique: true
         mongo.activate_index! index
         mongo.remove_index index
-        mongo.active_indexes(collection).should_not include index
+        expect(mongo.active_indexes(collection)).not_to include index
       end
     end
 
     describe 'atomic operations' do
-      after(:all) { mongo.delete_all klass }
-
       it 'increments the value of an attribute' do
         id = mongo.insert klass, { count: 1 }, []
         mongo.increment klass, id, :count
         mongo.increment klass, id, :count, 10
         query = mongo.query { |o| o.id == id }
-        mongo.retrieve(klass, query).first['count'].should be == 12
+        expect(mongo.retrieve(klass, query).first['count']).to be == 12
         mongo.increment klass, id, :count, -1
-        mongo.retrieve(klass, query).first['count'].should be == 11
+        expect(mongo.retrieve(klass, query).first['count']).to be == 11
       end
     end
 

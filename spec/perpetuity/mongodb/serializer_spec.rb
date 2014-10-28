@@ -37,12 +37,12 @@ module Perpetuity
       end
 
       it 'serializes an array of non-embedded attributes as references' do
-        user_mapper.stub(data_source: data_source)
-        book_mapper.stub(data_source: data_source)
-        data_source.should_receive(:can_serialize?).with(book.title).and_return true
-        data_source.should_receive(:can_serialize?).with(dave).and_return false
-        data_source.should_receive(:can_serialize?).with(andy).and_return false
-        serializer.serialize(book).should be == {
+        allow(user_mapper).to receive(:data_source).and_return data_source
+        allow(book_mapper).to receive(:data_source).and_return data_source
+        allow(data_source).to receive(:can_serialize?).with(book.title).and_return true
+        allow(data_source).to receive(:can_serialize?).with(dave).and_return false
+        allow(data_source).to receive(:can_serialize?).with(andy).and_return false
+        expect(serializer.serialize(book)).to be == {
           'title' => book.title,
           'authors' => [
             {
@@ -65,10 +65,10 @@ module Perpetuity
         book = Book.new('Original Title')
         updated_book = book.dup
         updated_book.title = 'New Title'
-        book_mapper.stub(data_source: data_source)
-        data_source.stub(:can_serialize?).with('New Title') { true }
-        data_source.stub(:can_serialize?).with('Original Title') { true }
-        serializer.serialize_changes(updated_book, book).should == {
+        allow(book_mapper).to receive(:data_source).and_return data_source
+        allow(data_source).to receive(:can_serialize?).with('New Title') { true }
+        allow(data_source).to receive(:can_serialize?).with('Original Title') { true }
+        expect(serializer.serialize_changes(updated_book, book)).to be == {
           'title' => 'New Title'
         }
       end
@@ -80,17 +80,17 @@ module Perpetuity
         let(:user_serializer) { Serializer.new(user_mapper) }
 
         before do
-          user_mapper.stub(data_source: data_source)
-          book_mapper.stub(data_source: data_source)
-          data_source.stub(:can_serialize?).with(name_data) { true }
+          allow(user_mapper).to receive(:data_source).and_return data_source
+          allow(book_mapper).to receive(:data_source).and_return data_source
+          allow(data_source).to receive(:can_serialize?).with(name_data) { true }
         end
 
         it 'serializes' do
-          user_serializer.serialize(user).should be == serialized_data
+          expect(user_serializer.serialize(user)).to be == serialized_data
         end
 
         it 'unserializes' do
-          user_serializer.unserialize(serialized_data).name.should be == user.name
+          expect(user_serializer.unserialize(serialized_data).name).to be == user.name
         end
       end
 
@@ -100,13 +100,13 @@ module Perpetuity
         let(:book) { Book.new(title, [author]) }
 
         before do
-          user_mapper.stub(data_source: data_source)
-          book_mapper.stub(data_source: data_source)
+          allow(user_mapper).to receive(:data_source).and_return(data_source)
+          allow(book_mapper).to receive(:data_source).and_return(data_source)
         end
 
         it 'passes the reference unserialized' do
-          data_source.should_receive(:can_serialize?).with('title') { true }
-          serializer.serialize(book).should == {
+          expect(data_source).to receive(:can_serialize?).with('title') { true }
+          expect(serializer.serialize(book)).to be == {
             'title' => title,
             'authors' => [{
               '__metadata__' => {
@@ -134,10 +134,10 @@ module Perpetuity
 
 
         it 'does not persist uninitialized attributes' do
-          mapper.stub data_source: data_source
-          data_source.should_receive(:can_serialize?).with(car_model) { true }
+          allow(mapper).to receive(:data_source).and_return data_source
+          allow(data_source).to receive(:can_serialize?).with(car_model) { true }
 
-          serializer.serialize(car).should == { 'model' => car_model }
+          expect(serializer.serialize(car)).to be == { 'model' => car_model }
         end
       end
 
@@ -147,10 +147,10 @@ module Perpetuity
         it 'stores metadata with marshal information' do
           book = Book.new(unserializable_value)
 
-          book_mapper.stub(data_source: data_source)
-          data_source.stub(:can_serialize?).with(book.title) { false }
+          allow(book_mapper).to receive(:data_source).and_return data_source
+          allow(data_source).to receive(:can_serialize?).with(book.title) { false }
 
-          serializer.serialize(book).should == {
+          expect(serializer.serialize(book)).to be == {
             'title' => {
               '__marshaled__' => true,
               'value' => Marshal.dump(unserializable_value)
@@ -161,10 +161,10 @@ module Perpetuity
 
         it 'stores marshaled attributes within arrays' do
           book = Book.new([unserializable_value])
-          book_mapper.stub(data_source: data_source)
-          data_source.stub(:can_serialize?).with(book.title.first) { false }
+          allow(book_mapper).to receive(:data_source).and_return data_source
+          allow(data_source).to receive(:can_serialize?).with(book.title.first) { false }
 
-          serializer.serialize(book).should == {
+          expect(serializer.serialize(book)).to be == {
             'title' => [{
               '__marshaled__' => true,
               'value' => Marshal.dump(unserializable_value)
@@ -180,13 +180,13 @@ module Perpetuity
               'value' => Marshal.dump(unserializable_value),
             }
           }
-          serializer.unserialize(data).title.should be_a unserializable_value.class
+          expect(serializer.unserialize(data).title).to be_a unserializable_value.class
         end
 
         it 'does not unmarshal data not marshaled by the serializer' do
           data = { 'title' => Marshal.dump(unserializable_value) }
 
-          serializer.unserialize(data).title.should be_a String
+          expect(serializer.unserialize(data).title).to be_a String
         end
       end
 
@@ -201,11 +201,11 @@ module Perpetuity
         }
 
         object = serializer.unserialize(serialized_data)
-        object.instance_variable_get(:@number).should == 1
-        object.instance_variable_get(:@string).should == 'hello'
-        object.instance_variable_get(:@boolean).should == true
-        object.instance_variable_get(:@float).should == 7.5
-        object.instance_variable_get(:@time).should == time
+        expect(object.instance_variable_get(:@number)).to be == 1
+        expect(object.instance_variable_get(:@string)).to be == 'hello'
+        expect(object.instance_variable_get(:@boolean)).to be == true
+        expect(object.instance_variable_get(:@float)).to be == 7.5
+        expect(object.instance_variable_get(:@time)).to be == time
       end
     end
   end

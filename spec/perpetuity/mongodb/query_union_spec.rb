@@ -9,7 +9,7 @@ module Perpetuity
       let(:union) { QueryUnion.new lhs, rhs }
 
       it 'returns the proper union of two expressions' do
-        union.to_db.should be == { '$or' => [{first: 'one'}, {second: 'two'}] }
+        expect(union.to_db).to be == { '$or' => [{first: 'one'}, {second: 'two'}] }
       end
     end
   end

@@ -9,7 +9,7 @@ module Perpetuity
       let(:intersection) { QueryIntersection.new lhs, rhs }
 
       it 'returns a Mongo representation of the union of 2 expressions' do
-        intersection.to_db.should be == { '$and' => [{first: 'one'}, {second: 'two'}] }
+        expect(intersection.to_db).to be == { '$and' => [{first: 'one'}, {second: 'two'}] }
       end
     end
   end
