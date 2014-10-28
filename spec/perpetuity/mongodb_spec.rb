@@ -154,7 +154,7 @@ module Perpetuity
 
       it 'can insert serializable values' do
         serializable_values.each do |value|
-          expect(mongo.insert(Object, {value: value}, [])).to be_a Moped::BSON::ObjectId
+          expect(mongo.insert(Object, {value: value}, [])).to be_a BSON::ObjectId
           expect(mongo.can_serialize?(value)).to be_truthy
         end
       end
