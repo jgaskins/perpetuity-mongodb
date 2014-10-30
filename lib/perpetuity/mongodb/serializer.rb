@@ -112,7 +112,7 @@ module Perpetuity
           value_mapper = mapper_registry[value.class]
           value_serializer = Serializer.new(value_mapper)
           attr = value_serializer.serialize(value)
-          attr.merge '__metadata__' =>  { 'class' => value.class }
+          attr.merge '__metadata__' =>  { 'class' => value.class.to_s }
         else
           serialize_reference(value)
         end
